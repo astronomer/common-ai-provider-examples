@@ -134,7 +134,7 @@ Adapting to your stack
 
 - Swap the LLM by editing `pydanticai_default.extra.model` to e.g.
   `anthropic:claude-sonnet-4-6` or `ollama:llama3`. Set the matching API
-  key via `conn_password` or environment variable.
+  key via the connection password or environment variable.
 - Swap the warehouse by pointing the `space_logistics` connection at
   Postgres, Snowflake, or BigQuery — no DAG changes required for the
   SQL-toolset and schema-compare examples.
