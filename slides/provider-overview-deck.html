@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>apache-airflow-providers-common-ai</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #FFB32D;
+  --purple: #872DED;
+  --teal: #13BDD7;
+  --blue: #2676FF;
+  --green: #19BA5A;
+  --red: #F03A47;
+  --ink: #12111c;
+  --surface: rgba(22,20,34,.92);
+  --surface2: rgba(34,32,50,.65);
+  --text: #E8E0D5;
+  --dim: rgba(232,224,213,.55);
+  --border: rgba(232,224,213,.1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  overflow: hidden;
+}
+canvas#sky { position: fixed; inset: 0; z-index: 0; }
+.scan {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(232,224,213,.015) 0 1px, transparent 1px 4px);
+}
+.logo-w {
+  position: fixed; bottom: 14px; left: 14px;
+  z-index: 100; opacity: .22; color: var(--text);
+}
+.logo-w svg { display: block; }
+.prog {
+  position: fixed; bottom: 0; left: 0; height: 3px; z-index: 100;
+  background: var(--gold); transition: width .4s;
+}
+.snum {
+  position: fixed; bottom: 14px; right: 18px; z-index: 100;
+  font: 500 11px 'Roboto Mono', monospace; color: var(--dim);
+}
+.deck {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+}
+.slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transform: translateY(24px) scale(.985);
+  transition: opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  padding: 28px;
+}
+.slide.active { opacity: 1; transform: none; pointer-events: auto; }
+.fr {
+  width: 100%; max-width: 1000px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 26px 32px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transform: scale(1.35);
+  transform-origin: center center;
+}
+.fr::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent);
+}
+.fr-c { text-align: center; }
+.fr-gold { border-top: 3px solid var(--gold); }
+.fr-purple { border-top: 3px solid var(--purple); }
+.fr-teal { border-top: 3px solid var(--teal); }
+.fr-blue { border-top: 3px solid var(--blue); }
+.fr-green { border-top: 3px solid var(--green); }
+.fr-red { border-top: 3px solid var(--red); }
+h1, h2, h3 {
+  font-family: 'League Gothic', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  line-height: 1.02;
+}
+h1 { font-size: 54px; }
+h2 { font-size: 34px; }
+h3 { font-size: 22px; }
+p, li { line-height: 1.55; font-size: 14px; }
+.eyebrow {
+  font: 500 10px/1 'Roboto Mono', monospace;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 8px;
+}
+.eyebrow-gold { color: var(--gold); }
+.eyebrow-purple { color: var(--purple); }
+.eyebrow-green { color: var(--green); }
+.eyebrow-red { color: var(--red); }
+.eyebrow-blue { color: var(--blue); }
+.divider {
+  width: 48px; height: 2px; margin: 10px 0 14px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+.divider-c {
+  margin-left: auto; margin-right: auto;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.cols { display: grid; gap: 14px; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.codeblock {
+  background: #0d1117; border: 1px solid #21262d; border-radius: 8px;
+  padding: 12px 14px; font: 12px/1.5 'Roboto Mono', monospace;
+  color: #c9d1d9; white-space: pre; overflow: hidden;
+}
+.codeblock.small { font-size: 10.5px; line-height: 1.5; padding: 10px 12px; }
+.codeblock .kw { color: #ff7b72; }
+.codeblock .fn { color: #d2a8ff; }
+.codeblock .dc { color: #79c0ff; }
+.codeblock .st { color: #a5d6ff; }
+.codeblock .co { color: #8b949e; font-style: italic; }
+.codeblock .cl { color: #79c0ff; }
+.codeblock .nm { color: #c9d1d9; }
+.codeblock .nu { color: #f2cc60; }
+.feat-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px;
+  font: 500 9px 'Roboto Mono', monospace; color: var(--text);
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  margin-right: 4px; margin-bottom: 4px;
+  text-transform: uppercase; letter-spacing: 1.3px;
+}
+.feat-dot { width: 5px; height: 5px; border-radius: 50%; }
+.dot-gold { background: var(--gold); }
+.dot-purple { background: var(--purple); }
+.dot-teal { background: var(--teal); }
+.dot-blue { background: var(--blue); }
+.dot-green { background: var(--green); }
+.dot-red { background: var(--red); }
+.title-main {
+  font-size: 86px; line-height: .95;
+  background: linear-gradient(90deg, var(--gold), var(--teal) 45%, var(--purple));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.subtitle { font-size: 20px; color: var(--dim); font-weight: 300; letter-spacing: .04em; }
+.kv {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 6px 14px;
+  font-size: 12.5px;
+}
+.kv .k {
+  font: 500 10px/1.4 'Roboto Mono', monospace;
+  color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px;
+  padding-top: 2px;
+}
+.kv .v { color: var(--text); }
+.mini-h {
+  font: 500 10px 'Roboto Mono', monospace;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.sig {
+  background: rgba(135,45,237,.08);
+  border: 1px dashed rgba(135,45,237,.35);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font: 500 12px 'Roboto Mono', monospace;
+  color: var(--purple);
+  margin: 8px 0;
+  overflow: hidden;
+}
+.sig .mod { color: var(--dim); }
+.sig .cls { color: var(--teal); }
+.callout {
+  border-left: 3px solid var(--gold);
+  background: rgba(255,179,45,.07);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font: 500 9.5px 'Roboto Mono', monospace;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 3px;
+}
+.tag-op { background: rgba(19,189,215,.15); color: var(--teal); border: 1px solid rgba(19,189,215,.3); }
+.tag-hook { background: rgba(135,45,237,.15); color: var(--purple); border: 1px solid rgba(135,45,237,.3); }
+.tag-tool { background: rgba(255,179,45,.15); color: var(--gold); border: 1px solid rgba(255,179,45,.3); }
+.tag-conn { background: rgba(38,118,255,.15); color: var(--blue); border: 1px solid rgba(38,118,255,.3); }
+.tag-feat { background: rgba(25,186,90,.15); color: var(--green); border: 1px solid rgba(25,186,90,.3); }
+.lead { font-size: 14.5px; color: var(--text); }
+ul.tight { padding-left: 18px; }
+ul.tight li { margin-bottom: 4px; font-size: 13px; }
+.caption {
+  font: 500 10px 'Roboto Mono', monospace;
+  letter-spacing: 1.5px;
+  color: var(--dim);
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+.pipe {
+  display: flex; align-items: center; gap: 10px; justify-content: center;
+  padding: 12px 0; flex-wrap: wrap;
+}
+.pipe-node {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font: 500 11px 'Roboto Mono', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,.1);
+  background: var(--surface2);
+  color: var(--text);
+}
+.arrow { color: var(--gold); font-weight: 500; font-family: 'Roboto Mono', monospace; font-size: 13px; }
+.grid-covered {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  font: 500 10.5px 'Roboto Mono', monospace;
+}
+.grid-covered .row {
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: rgba(25,186,90,.08);
+  border: 1px solid rgba(25,186,90,.3);
+  color: var(--text);
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 8px;
+}
+.grid-covered .row .check { color: var(--green); font-weight: 700; }
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div class="scan"></div>
+<div class="logo-w"><svg width="160" height="16" viewBox="0 0 277 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M35.733 1.02437C34.2787 1.70729 33.1707 2.66339 32.409 3.75607C31.6472 4.91705 31.2317 6.14632 31.2317 7.58046C31.2317 9.35607 31.6472 10.7902 32.4782 11.8146C33.3092 12.9073 34.2787 13.6585 35.456 14.1366C36.564 14.6146 38.0875 15.161 40.0265 15.7073C41.4115 16.0488 42.5195 16.3902 43.2812 16.7317C44.043 17.0731 44.7355 17.4829 45.2202 17.961C45.705 18.5073 45.982 19.1219 45.982 20.0097C45.982 21.1707 45.4972 22.1268 44.4585 22.878C43.489 23.6975 42.104 24.039 40.3727 24.039C37.6027 24.039 35.3175 23.0146 33.3785 21.0341L30.47 23.9024C31.4395 24.9951 32.7552 25.9512 34.4865 26.7707C36.2177 27.5902 38.1567 28 40.442 28C42.4502 28 44.1815 27.6585 45.705 26.9073C47.2285 26.1561 48.4057 25.2 49.1675 23.9707C49.9985 22.7414 50.414 21.4439 50.414 20.0097C50.414 18.2341 49.9985 16.8 49.1675 15.7756C48.3365 14.6829 47.367 13.9317 46.1897 13.4536C45.0125 12.9756 43.5582 12.4292 41.6192 11.8829C40.2342 11.5414 39.1262 11.2 38.3645 10.8585C37.6027 10.517 36.9102 10.1073 36.4255 9.62924C35.9407 9.0829 35.6637 8.46827 35.6637 7.58046C35.6637 6.55607 36.1485 5.66827 37.0487 4.98534C37.949 4.30242 39.2647 3.89266 40.8575 3.89266C42.0347 3.89266 43.1427 4.16583 44.1122 4.64388C45.0817 5.12193 45.982 5.66827 46.6745 6.3512L49.6522 3.5512C48.752 2.5951 47.5055 1.77559 45.982 1.09266C44.4585 0.409732 42.7272 0.0682689 40.8575 0.0682689C38.8492-2.37785e-05 37.1872 0.34144 35.733 1.02437ZM174.441 4.02924C175.687 4.23412 176.795 4.64388 177.903 5.25851C179.496 6.14632 180.742 7.37559 181.643 8.94632C182.543 10.517 183.028 12.2244 183.028 14.0683C183.028 15.9122 182.543 17.6195 181.643 19.1902C180.742 20.761 179.496 21.9902 177.903 22.878C176.31 23.7658 174.579 24.2439 172.709 24.2439C170.84 24.2439 169.108 23.7658 167.516 22.878C167.308 22.7414 167.1 22.6731 166.962 22.5366L165.438 26.2927C167.654 27.4536 170.078 28.0683 172.779 28.0683C175.549 28.0683 178.042 27.4536 180.258 26.2244C182.543 24.9951 184.274 23.2878 185.59 21.1707C186.906 19.0536 187.529 16.6634 187.529 14.1366C187.529 11.5414 186.906 9.21949 185.59 7.10242C184.274 4.98534 182.543 3.27803 180.258 2.04876C178.942 1.29754 177.557 0.819488 176.033 0.478025L174.441 4.02924ZM116.963 4.02924C118.21 4.23412 119.318 4.64388 120.426 5.25851C122.018 6.14632 123.265 7.37559 124.165 8.94632C125.065 10.517 125.55 12.2244 125.55 14.0683C125.55 15.9122 125.065 17.6195 124.165 19.1902C123.265 20.761 122.018 21.9902 120.426 22.878C118.833 23.7658 117.102 24.2439 115.232 24.2439C113.362 24.2439 111.631 23.7658 110.038 22.878C109.83 22.7414 109.623 22.6731 109.484 22.5366L107.961 26.2927C110.177 27.4536 112.6 28.0683 115.301 28.0683C118.071 28.0683 120.564 27.4536 122.78 26.2244C125.065 24.9951 126.797 23.2878 128.112 21.1707C129.428 19.0536 130.051 16.6634 130.051 14.1366C130.051 11.5414 129.428 9.21949 128.112 7.10242C126.797 4.98534 125.065 3.27803 122.78 2.04876C121.464 1.29754 120.079 0.819488 118.556 0.478025L116.963 4.02924ZM255.255 0.409732V27.6585H259.618V17.4829H266.197L271.945 27.5902H276.931L270.629 16.8C272.222 16.117 273.537 15.0927 274.507 13.6585C275.476 12.2244 275.961 10.6536 275.961 8.94632C275.961 7.30729 275.546 5.87315 274.784 4.57559C274.022 3.27802 272.914 2.25363 271.529 1.50242C270.144 0.751196 268.551 0.34144 266.82 0.34144L255.255 0.409732ZM259.687 4.30242H266.889C268.274 4.30242 269.452 4.71217 270.352 5.59998C271.252 6.48778 271.668 7.58046 271.668 8.94632C271.668 10.3122 271.252 11.4049 270.352 12.2927C269.452 13.1805 268.344 13.5902 266.889 13.5902H259.687V4.30242ZM228.663 0.409732V27.6585H248.815V23.7658H233.095V15.4341H245.283V11.5414H233.095V4.30242H248.469V0.409732H228.663ZM217.93 0.409732L207.404 13.5902H207.334L196.808 0.409732H192.792V27.6585H197.155V7.71705H197.293L207.265 20.2146L217.237 7.71705H217.376V27.6585H221.738V0.409732H217.93ZM155.051 0.409732V20.2829H154.912L139.677 0.409732H135.73V27.6585H140.093V7.71705H140.231L155.466 27.5902H159.483V0.409732H155.051ZM81.9227 0.409732V27.6585H86.2855V17.4829H92.8642L98.612 27.5902H103.598L97.2962 16.8C98.889 16.117 100.205 15.0927 101.174 13.6585C102.144 12.2244 102.628 10.6536 102.628 8.94632C102.628 7.30729 102.213 5.87315 101.451 4.57559C100.689 3.27802 99.5815 2.25363 98.1965 1.50242C96.8115 0.751196 95.2187 0.34144 93.4875 0.34144L81.9227 0.34144ZM86.2855 4.30242H93.4875C94.8725 4.30242 96.0497 4.71217 96.95 5.59998C97.8502 6.48778 98.2657 7.58046 98.2657 8.94632C98.2657 10.3122 97.8502 11.4049 96.95 12.2927C96.0497 13.1805 94.9417 13.5902 93.4875 13.5902H86.2855V4.30242ZM54.569 0.409732V4.30242H62.9482V27.6585H67.311V4.30242H75.6902V0.409732H54.569ZM11.1492 0.409732L0 27.5902H4.50125L7.27125 20.6244H19.5977L22.437 27.5902H27.0767L19.8747 10.039H15.3735L18.005 16.7317H8.864L15.3735 0.409732H11.1492Z" fill="currentColor"/>
+</svg></div>
+<div class="prog" id="prog"></div>
+<div class="snum" id="snum"></div>
+
+<div class="deck" id="deck">
+
+<!-- 1. Title -->
+<section class="slide active">
+  <div class="fr fr-c fr-gold">
+    <div class="eyebrow eyebrow-gold">Apache Airflow &middot; Provider</div>
+    <h1 class="title-main">Common AI<br>Provider</h1>
+    <div class="divider divider-c"></div>
+    <p class="subtitle">LLMs and agents as first-class Airflow tasks</p>
+    <div style="margin-top: 18px;">
+      <span class="feat-pill"><span class="feat-dot dot-gold"></span>6 operators</span>
+      <span class="feat-pill"><span class="feat-dot dot-purple"></span>2 hooks</span>
+      <span class="feat-pill"><span class="feat-dot dot-teal"></span>5 toolsets</span>
+      <span class="feat-pill"><span class="feat-dot dot-blue"></span>2 connections</span>
+      <span class="feat-pill"><span class="feat-dot dot-green"></span>HITL review plugin</span>
+    </div>
+    <div class="caption" style="margin-top: 20px;">apache-airflow-providers-common-ai &middot; requires airflow 3.0+</div>
+  </div>
+</section>
+
+<!-- 2. What is it -->
+<section class="slide">
+  <div class="fr fr-teal">
+    <div class="eyebrow">Overview</div>
+    <h2>An Airflow-native bridge to pydantic-ai</h2>
+    <div class="divider"></div>
+    <div class="cols cols-2">
+      <div>
+        <p class="lead">The provider wraps <code style="color:var(--gold); font-family:'Roboto Mono',monospace;">pydantic-ai</code> so you can call LLMs, route branches, analyze files, generate SQL, and run multi-turn agents from inside a dag.</p>
+        <ul class="tight" style="margin-top: 12px;">
+          <li>Provider-agnostic: OpenAI, Anthropic, Bedrock, Vertex AI, Ollama, Azure</li>
+          <li>Structured outputs via Pydantic <code style="color:var(--purple);font-family:'Roboto Mono',monospace;">output_type</code></li>
+          <li>Agents with toolsets: SQL, MCP, DataFusion, Hook, Logging</li>
+          <li>Human-in-the-loop review ships as a FastAPI plugin</li>
+        </ul>
+      </div>
+      <div>
+        <div class="mini-h">Who it is for</div>
+        <div class="card">
+          <p style="font-size: 12.5px;">Teams that already orchestrate pipelines in Airflow and want LLM reasoning in the same execution model, not a separate agent runtime. One place to debug, secure, schedule, and observe.</p>
+        </div>
+        <div class="mini-h" style="margin-top: 12px;">Install</div>
+<div class="codeblock small">pip install apache-airflow-providers-common-ai</div>
+        <div class="mini-h" style="margin-top: 10px;">Docs</div>
+        <div class="callout" style="font-size: 11.5px; word-break: break-all;">airflow.apache.org/docs/apache-airflow-providers-common-ai/stable/</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Provider surface -->
+<section class="slide">
+  <div class="fr fr-purple">
+    <div class="eyebrow eyebrow-purple">Provider surface</div>
+    <h2>Everything the provider exposes</h2>
+    <div class="divider"></div>
+    <div class="cols cols-2">
+      <div>
+        <div class="mini-h">Operators &amp; decorators <span class="tag tag-op">6</span></div>
+        <div class="card" style="margin-bottom: 10px; font: 500 11px/1.7 'Roboto Mono',monospace;">
+          LLMOperator <span style="color:var(--dim)">/</span> @task.llm<br>
+          LLMFileAnalysisOperator <span style="color:var(--dim)">/</span> @task.llm_file_analysis<br>
+          LLMBranchOperator <span style="color:var(--dim)">/</span> @task.llm_branch<br>
+          LLMSQLQueryOperator <span style="color:var(--dim)">/</span> @task.llm_sql<br>
+          LLMSchemaCompareOperator<br>
+          AgentOperator <span style="color:var(--dim)">/</span> @task.agent
+        </div>
+        <div class="mini-h">Hooks <span class="tag tag-hook">2</span></div>
+        <div class="card" style="font: 500 11px/1.7 'Roboto Mono',monospace;">
+          PydanticAIHook<br>
+          MCPHook
+        </div>
+      </div>
+      <div>
+        <div class="mini-h">Toolsets (for AgentOperator) <span class="tag tag-tool">5</span></div>
+        <div class="card" style="margin-bottom: 10px; font: 500 11px/1.7 'Roboto Mono',monospace;">
+          HookToolset<br>
+          SQLToolset<br>
+          DataFusionToolset<br>
+          MCPToolset<br>
+          LoggingToolset
+        </div>
+        <div class="mini-h">Connections <span class="tag tag-conn">2</span></div>
+        <div class="card" style="margin-bottom: 10px; font: 500 11px/1.7 'Roboto Mono',monospace;">
+          pydanticai<br>
+          mcp (stdio + http)
+        </div>
+        <div class="mini-h">Plugin features <span class="tag tag-feat">+1</span></div>
+        <div class="card" style="font: 500 11px/1.7 'Roboto Mono',monospace;">
+          HITL review (FastAPI <span style="color:var(--gold)">/hitl-review</span>)
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Connections -->
+<section class="slide">
+  <div class="fr fr-blue">
+    <div class="eyebrow eyebrow-blue">Connections</div>
+    <h2>Two conn_types configure the whole surface</h2>
+    <div class="divider"></div>
+    <div class="cols cols-2">
+      <div>
+        <span class="tag tag-conn">pydanticai</span>
+        <p style="font-size: 12.5px; margin-top: 8px;">Points every LLM operator and agent at a pydantic-ai model. Swap providers by editing one field.</p>
+<div class="codeblock small">{
+  <span class="st">"conn_type"</span>: <span class="st">"pydanticai"</span>,
+  <span class="st">"extra"</span>: {
+    <span class="st">"model"</span>: <span class="st">"openai:gpt-5-mini"</span>
+  }
+}</div>
+        <p class="caption" style="margin-top: 6px;">swap prefix: openai: / anthropic: / bedrock: / google-vertex: / ollama: / azure:</p>
+      </div>
+      <div>
+        <span class="tag tag-conn">mcp</span>
+        <p style="font-size: 12.5px; margin-top: 8px;">Points agents at a Model Context Protocol server. stdio launches a subprocess; http hits a remote endpoint.</p>
+<div class="codeblock small">{
+  <span class="st">"conn_type"</span>: <span class="st">"mcp"</span>,
+  <span class="st">"extra"</span>: {
+    <span class="st">"transport"</span>: <span class="st">"stdio"</span>,
+    <span class="st">"command"</span>: <span class="st">"python"</span>,
+    <span class="st">"args"</span>: [<span class="st">"server.py"</span>]
+  }
+}</div>
+        <p class="caption" style="margin-top: 6px;">http variant: set transport to <code style="font-family:'Roboto Mono',monospace">"http"</code> and host to a URL.</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top: 14px;">Both connections can live in <code style="font-family:'Roboto Mono',monospace;color:var(--gold)">.env</code> as <code style="font-family:'Roboto Mono',monospace;color:var(--gold)">AIRFLOW_CONN_*</code> JSON, or be created in the Airflow UI / secrets backend.</div>
+  </div>
+</section>
+
+<!-- 5. LLMOperator -->
+<section class="slide">
+  <div class="fr fr-gold">
+    <div class="eyebrow eyebrow-gold">Operator 1 of 6</div>
+    <h2>LLMOperator &nbsp;/&nbsp; @task.llm</h2>
+    <div class="divider"></div>
+    <p class="lead">Single-shot LLM call. Takes a prompt, returns a string, or a Pydantic model if <code style="color:var(--purple);font-family:'Roboto Mono',monospace;">output_type=...</code> is set.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.operators.llm <span class="mod">import</span> <span class="cls">LLMOperator</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small"><span class="dc">@task.llm</span>(
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">system_prompt</span>=<span class="st">"You are a safety officer."</span>,
+  <span class="nm">output_type</span>=<span class="cl">SeverityReport</span>,
+)
+<span class="kw">def</span> <span class="fn">summarize</span>(text: str) -> str:
+  <span class="kw">return</span> <span class="st">f"Summarize: {text}"</span></div>
+      </div>
+      <div>
+        <div class="mini-h">Key parameters</div>
+        <div class="kv">
+          <div class="k">llm_conn_id</div><div class="v">pydanticai connection</div>
+          <div class="k">system_prompt</div><div class="v">role and rules</div>
+          <div class="k">output_type</div><div class="v">Pydantic model class</div>
+          <div class="k">prompt</div><div class="v">templated user message</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Use for</div>
+        <p style="font-size: 12px;">Summarization, classification, extraction. Single-step, deterministic IO shape, no tool use. Fastest and cheapest primitive.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. LLMFileAnalysisOperator -->
+<section class="slide">
+  <div class="fr fr-gold">
+    <div class="eyebrow eyebrow-gold">Operator 2 of 6</div>
+    <h2>LLMFileAnalysisOperator &nbsp;/&nbsp; @task.llm_file_analysis</h2>
+    <div class="divider"></div>
+    <p class="lead">Reads a file (pdf, image, log, markdown) via an <code style="color:var(--gold);font-family:'Roboto Mono',monospace;">ObjectStoragePath</code> URI and hands its contents to the model as multimodal input.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.operators.llm_file_analysis <span class="mod">import</span> <span class="cls">LLMFileAnalysisOperator</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small"><span class="dc">@task.llm_file_analysis</span>(
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">file_path</span>=<span class="st">"s3://bucket/log.pdf"</span>,
+  <span class="nm">output_type</span>=<span class="cl">FileAnalysisReport</span>,
+)
+<span class="kw">def</span> <span class="fn">analyze_log</span>() -> str:
+  <span class="kw">return</span> <span class="st">"Extract anomalies with confidence."</span></div>
+      </div>
+      <div>
+        <div class="mini-h">Key parameters</div>
+        <div class="kv">
+          <div class="k">file_path</div><div class="v"><code style="font-family:'Roboto Mono',monospace">file://</code>, <code style="font-family:'Roboto Mono',monospace">s3://</code>, <code style="font-family:'Roboto Mono',monospace">gs://</code>, ...</div>
+          <div class="k">llm_conn_id</div><div class="v">pydanticai connection</div>
+          <div class="k">output_type</div><div class="v">optional Pydantic model</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Use for</div>
+        <p style="font-size: 12px;">Invoice / PDF extraction, image triage, log &rarr; structured findings. Any task where the input is a blob, not a string.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. LLMBranchOperator -->
+<section class="slide">
+  <div class="fr fr-gold">
+    <div class="eyebrow eyebrow-gold">Operator 3 of 6</div>
+    <h2>LLMBranchOperator &nbsp;/&nbsp; @task.llm_branch</h2>
+    <div class="divider"></div>
+    <p class="lead">The LLM picks which downstream <code style="color:var(--gold);font-family:'Roboto Mono',monospace;">task_id</code> to run. Inherits BranchPythonOperator semantics: returned task runs, siblings are skipped.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.operators.llm_branch <span class="mod">import</span> <span class="cls">LLMBranchOperator</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small"><span class="dc">@task.llm_branch</span>(
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">system_prompt</span>=(
+    <span class="st">"Route to fast_lane, review, "</span>
+    <span class="st">"or quarantine based on hazard."</span>
+  ),
+)
+<span class="kw">def</span> <span class="fn">route</span>(payload: str) -> str:
+  <span class="kw">return</span> <span class="st">f"Route:\n{payload}"</span>
+
+route(input()) &gt;&gt; [fast_lane(), review(), quarantine()]</div>
+      </div>
+      <div>
+        <div class="mini-h">How it decides</div>
+        <ul class="tight">
+          <li>Candidate branches are the downstream task_ids</li>
+          <li>system_prompt defines routing rules in natural language</li>
+          <li>Model returns one task_id, validated against the set</li>
+        </ul>
+        <div class="mini-h" style="margin-top: 10px;">Use for</div>
+        <p style="font-size: 12px;">Natural-language triage, escalation, dispatching where a rules engine would be brittle or hard to maintain.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. LLMSQLQueryOperator -->
+<section class="slide">
+  <div class="fr fr-gold">
+    <div class="eyebrow eyebrow-gold">Operator 4 of 6</div>
+    <h2>LLMSQLQueryOperator &nbsp;/&nbsp; @task.llm_sql</h2>
+    <div class="divider"></div>
+    <p class="lead">Turns a natural-language question into a single SQL string for a target dialect, grounded on the real schema of the listed tables. Returns the SQL; you execute it downstream.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.operators.llm_sql <span class="mod">import</span> <span class="cls">LLMSQLQueryOperator</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small"><span class="dc">@task.llm_sql</span>(
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">db_conn_id</span>=<span class="st">"warehouse"</span>,
+  <span class="nm">table_names</span>=[<span class="st">"orders"</span>, <span class="st">"customers"</span>],
+  <span class="nm">dialect</span>=<span class="st">"postgres"</span>,
+)
+<span class="kw">def</span> <span class="fn">nl_to_sql</span>(question: str) -> str:
+  <span class="kw">return</span> question</div>
+      </div>
+      <div>
+        <div class="mini-h">Key parameters</div>
+        <div class="kv">
+          <div class="k">db_conn_id</div><div class="v">warehouse to introspect</div>
+          <div class="k">table_names</div><div class="v">tables to expose</div>
+          <div class="k">dialect</div><div class="v">postgres / snowflake / sqlite / ...</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Use for</div>
+        <p style="font-size: 12px;">Natural-language dashboards for non-SQL users, pre-generating queries for human review, seeding data checks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. LLMSchemaCompareOperator -->
+<section class="slide">
+  <div class="fr fr-gold">
+    <div class="eyebrow eyebrow-gold">Operator 5 of 6</div>
+    <h2>LLMSchemaCompareOperator</h2>
+    <div class="divider"></div>
+    <p class="lead">Introspects two or more databases, hands their schemas to the model, and returns a compatibility report: renames, type drift, breaking changes.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.operators.llm_schema_compare <span class="mod">import</span> <span class="cls">LLMSchemaCompareOperator</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">compare = <span class="cl">LLMSchemaCompareOperator</span>(
+  <span class="nm">task_id</span>=<span class="st">"compare_schemas"</span>,
+  <span class="nm">prompt</span>=(
+    <span class="st">"Flag mismatches that would break "</span>
+    <span class="st">"CDC from primary to replica."</span>
+  ),
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">db_conn_ids</span>=[<span class="st">"primary"</span>, <span class="st">"replica"</span>],
+  <span class="nm">table_names</span>=[<span class="st">"orders"</span>],
+  <span class="nm">context_strategy</span>=<span class="st">"full"</span>,
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Report shape</div>
+<div class="codeblock small">{
+  <span class="st">"compatible"</span>: <span class="kw">false</span>,
+  <span class="st">"mismatches"</span>: [...],
+  <span class="st">"suggested_actions"</span>: [...]
+}</div>
+        <div class="mini-h" style="margin-top: 10px;">Use for</div>
+        <p style="font-size: 12px;">CDC / replication readiness, migration gates, warehouse-to-warehouse compatibility checks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. AgentOperator -->
+<section class="slide">
+  <div class="fr fr-gold">
+    <div class="eyebrow eyebrow-gold">Operator 6 of 6</div>
+    <h2>AgentOperator &nbsp;/&nbsp; @task.agent</h2>
+    <div class="divider"></div>
+    <p class="lead">A multi-turn pydantic-ai agent wrapped as an Airflow task. Accepts a system prompt, an optional <code style="color:var(--purple);font-family:'Roboto Mono',monospace;">output_type</code>, and a list of toolsets the model may call. One task, up to N LLM turns.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.operators.agent <span class="mod">import</span> <span class="cls">AgentOperator</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small"><span class="dc">@task.agent</span>(
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">system_prompt</span>=<span class="st">"You are a planner."</span>,
+  <span class="nm">output_type</span>=<span class="cl">MissionPlan</span>,
+)
+<span class="kw">def</span> <span class="fn">plan</span>(brief: dict) -> str:
+  <span class="kw">return</span> <span class="st">f"Plan: {brief}"</span></div>
+      </div>
+      <div>
+        <div class="mini-h">Key parameters</div>
+        <div class="kv">
+          <div class="k">prompt</div><div class="v">user message (templated)</div>
+          <div class="k">system_prompt</div><div class="v">role and rules</div>
+          <div class="k">toolsets</div><div class="v">optional list of Toolset</div>
+          <div class="k">output_type</div><div class="v">optional Pydantic class</div>
+          <div class="k">enable_hitl_review</div><div class="v">gate result on human review</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Why</div>
+        <p style="font-size: 12px;">Multi-turn reasoning with tool use. Every tool call is logged automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. PydanticAIHook -->
+<section class="slide">
+  <div class="fr fr-purple">
+    <div class="eyebrow eyebrow-purple">Hook 1 of 2</div>
+    <h2>PydanticAIHook</h2>
+    <div class="divider"></div>
+    <p class="lead">The low-level API every LLM operator is built on. Instantiate the hook, build an agent with <code style="color:var(--purple);font-family:'Roboto Mono',monospace;">create_agent(...)</code>, call <code style="color:var(--purple);font-family:'Roboto Mono',monospace;">run_sync(...)</code>. Your escape hatch when the operators do not fit.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.hooks.pydantic_ai <span class="mod">import</span> <span class="cls">PydanticAIHook</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small"><span class="dc">@task</span>
+<span class="kw">def</span> <span class="fn">run_agent</span>(text: str) -> dict:
+  hook = <span class="cl">PydanticAIHook</span>(
+    <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  )
+  agent = hook.<span class="fn">create_agent</span>(
+    <span class="nm">instructions</span>=<span class="st">"Return a SeverityReport."</span>,
+    <span class="nm">output_type</span>=<span class="cl">SeverityReport</span>,
+  )
+  <span class="kw">return</span> agent.<span class="fn">run_sync</span>(text).output.<span class="fn">model_dump</span>()</div>
+      </div>
+      <div>
+        <div class="mini-h">Why drop down</div>
+        <ul class="tight">
+          <li>Custom streaming or token callbacks</li>
+          <li>Fine-grained agent lifecycle control</li>
+          <li>Patterns the operators have not surfaced yet</li>
+          <li>Composing multiple agents inside one task</li>
+        </ul>
+        <div class="mini-h" style="margin-top: 10px;">Returns</div>
+        <p style="font-size: 12px;">A pydantic-ai <code style="font-family:'Roboto Mono',monospace;color:var(--teal)">Agent</code> with all upstream features: deps, tool fns, streaming, usage.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12. MCPHook -->
+<section class="slide">
+  <div class="fr fr-purple">
+    <div class="eyebrow eyebrow-purple">Hook 2 of 2</div>
+    <h2>MCPHook</h2>
+    <div class="divider"></div>
+    <p class="lead">Low-level client for a Model Context Protocol server. Reads an <code style="color:var(--blue);font-family:'Roboto Mono',monospace;">mcp</code> connection, starts a session, lets you list or invoke MCP tools directly. Normally wrapped by <code style="color:var(--gold);font-family:'Roboto Mono',monospace;">MCPToolset</code>.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.hooks.mcp <span class="mod">import</span> <span class="cls">MCPHook</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small"><span class="dc">@task</span>
+<span class="kw">def</span> <span class="fn">list_mcp_tools</span>() -> list[str]:
+  hook = <span class="cl">MCPHook</span>(
+    <span class="nm">mcp_conn_id</span>=<span class="st">"mcp_default"</span>,
+  )
+  <span class="kw">with</span> hook.<span class="fn">get_session</span>() <span class="kw">as</span> session:
+    tools = session.<span class="fn">list_tools</span>()
+    <span class="kw">return</span> [t.name <span class="kw">for</span> t <span class="kw">in</span> tools]</div>
+      </div>
+      <div>
+        <div class="mini-h">When to reach for it</div>
+        <ul class="tight">
+          <li>Inspecting or smoke-testing an MCP server</li>
+          <li>Custom integrations outside the agent flow</li>
+          <li>Invoking a single MCP tool without spinning up an agent</li>
+        </ul>
+        <div class="mini-h" style="margin-top: 10px;">Transports</div>
+        <p style="font-size: 12px;">Honors the connection's <code style="font-family:'Roboto Mono',monospace">transport</code>: stdio or http. Same API either way.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. HookToolset -->
+<section class="slide">
+  <div class="fr fr-teal">
+    <div class="eyebrow">Toolset 1 of 5</div>
+    <h2>HookToolset</h2>
+    <div class="divider"></div>
+    <p class="lead">Lifts any Airflow Hook into the agent. Every public method in <code style="color:var(--gold);font-family:'Roboto Mono',monospace;">allowed_methods</code> becomes a callable tool. Reuses hooks you already ship, no tool rewriting.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.toolsets.hook <span class="mod">import</span> <span class="cls">HookToolset</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">toolset = <span class="cl">HookToolset</span>(
+  <span class="nm">hook</span>=<span class="cl">FSHook</span>(
+    <span class="nm">fs_conn_id</span>=<span class="st">"local_fs"</span>,
+  ),
+  <span class="nm">allowed_methods</span>=[
+    <span class="st">"list_files"</span>,
+    <span class="st">"read_file"</span>,
+  ],
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Inputs</div>
+        <div class="kv">
+          <div class="k">hook</div><div class="v">any instantiated Airflow Hook</div>
+          <div class="k">allowed_methods</div><div class="v">method-name allow-list</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Why it is powerful</div>
+        <ul class="tight">
+          <li>Works with any custom hook your team ships</li>
+          <li>Security by allow-list, not by convention</li>
+          <li>No pydantic-ai tool-function boilerplate</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. SQLToolset -->
+<section class="slide">
+  <div class="fr fr-teal">
+    <div class="eyebrow">Toolset 2 of 5</div>
+    <h2>SQLToolset</h2>
+    <div class="divider"></div>
+    <p class="lead">Four curated tools for agents that need to query real data: <code style="color:var(--teal);font-family:'Roboto Mono',monospace;">list_tables</code>, <code style="color:var(--teal);font-family:'Roboto Mono',monospace;">get_schema</code>, <code style="color:var(--teal);font-family:'Roboto Mono',monospace;">query</code>, <code style="color:var(--teal);font-family:'Roboto Mono',monospace;">check_query</code>.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.toolsets.sql <span class="mod">import</span> <span class="cls">SQLToolset</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">toolset = <span class="cl">SQLToolset</span>(
+  <span class="nm">db_conn_id</span>=<span class="st">"warehouse"</span>,
+  <span class="nm">allowed_tables</span>=[
+    <span class="st">"orders"</span>, <span class="st">"customers"</span>,
+  ],
+  <span class="nm">max_rows</span>=<span class="nu">50</span>,
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Safety rails</div>
+        <div class="kv">
+          <div class="k">db_conn_id</div><div class="v">which database</div>
+          <div class="k">allowed_tables</div><div class="v">table allow-list</div>
+          <div class="k">max_rows</div><div class="v">row cap per query</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Why not just @task.llm_sql</div>
+        <ul class="tight">
+          <li>Agent chains inspect &rarr; query &rarr; refine</li>
+          <li>Agent can correct on empty or error results</li>
+          <li>Multi-table joins without hand-written context</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15. DataFusionToolset -->
+<section class="slide">
+  <div class="fr fr-teal">
+    <div class="eyebrow">Toolset 3 of 5</div>
+    <h2>DataFusionToolset</h2>
+    <div class="divider"></div>
+    <p class="lead">In-process Arrow SQL over files. Register parquet, csv, or json as tables; the agent runs SQL over them without a warehouse.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.toolsets.datafusion <span class="mod">import</span> <span class="cls">DataFusionToolset</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">toolset = <span class="cl">DataFusionToolset</span>(
+  <span class="nm">datasource_configs</span>=[
+    <span class="cl">DataSourceConfig</span>(
+      <span class="nm">conn_id</span>=<span class="st">"local_fs"</span>,
+      <span class="nm">table_name</span>=<span class="st">"routes"</span>,
+      <span class="nm">uri</span>=<span class="st">"s3://bucket/routes.parquet"</span>,
+      <span class="nm">format</span>=<span class="st">"parquet"</span>,
+    ),
+  ],
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Config</div>
+        <div class="kv">
+          <div class="k">datasource_configs</div><div class="v">list of files &rarr; table names</div>
+          <div class="k">uri</div><div class="v"><code style="font-family:'Roboto Mono',monospace">file://</code>, <code style="font-family:'Roboto Mono',monospace">s3://</code>, ...</div>
+          <div class="k">format</div><div class="v">csv / parquet / json</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Use for</div>
+        <p style="font-size: 12px;">Ad-hoc analysis over an upstream dump, avoiding data movement into a warehouse for a one-shot.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 16. MCPToolset -->
+<section class="slide">
+  <div class="fr fr-teal">
+    <div class="eyebrow">Toolset 4 of 5</div>
+    <h2>MCPToolset</h2>
+    <div class="divider"></div>
+    <p class="lead">Plugs a full Model Context Protocol server into the agent. Handles transport, tool discovery, and call lifecycle. Reuse any MCP server your org already ships.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.toolsets.mcp <span class="mod">import</span> <span class="cls">MCPToolset</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">toolset = <span class="cl">MCPToolset</span>(
+  <span class="nm">mcp_conn_id</span>=<span class="st">"mcp_default"</span>,
+)
+
+<span class="co"># agent = AgentOperator(</span>
+<span class="co">#   ..., toolsets=[toolset])</span></div>
+      </div>
+      <div>
+        <div class="mini-h">Transports</div>
+        <div class="kv">
+          <div class="k">stdio</div><div class="v">local subprocess, good for dev</div>
+          <div class="k">http</div><div class="v">remote server, prod-grade</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Why MCP here</div>
+        <ul class="tight">
+          <li>Tools live server-side; Airflow does not hardcode them</li>
+          <li>Same agent code regardless of transport</li>
+          <li>Swap local dev for remote prod with a connection change</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 17. LoggingToolset -->
+<section class="slide">
+  <div class="fr fr-teal">
+    <div class="eyebrow">Toolset 5 of 5</div>
+    <h2>LoggingToolset</h2>
+    <div class="divider"></div>
+    <p class="lead">A decorator for toolsets. Wrap any other toolset, and every tool call, result, and duration lands in the task log with <code style="color:var(--gold);font-family:'Roboto Mono',monospace;">::group::</code> folding for the Airflow UI.</p>
+    <div class="sig"><span class="mod">from</span> airflow.providers.common.ai.toolsets.logging <span class="mod">import</span> <span class="cls">LoggingToolset</span></div>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">toolset = <span class="cl">LoggingToolset</span>(
+  <span class="nm">wrapped</span>=<span class="cl">SQLToolset</span>(
+    <span class="nm">db_conn_id</span>=<span class="st">"warehouse"</span>,
+    <span class="nm">allowed_tables</span>=[<span class="st">"orders"</span>],
+    <span class="nm">max_rows</span>=<span class="nu">100</span>,
+  ),
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Why you want this on by default</div>
+        <ul class="tight">
+          <li>Agent decisions become auditable in the log view</li>
+          <li>Correlates token usage with tool behavior</li>
+          <li>No observability code in the dag itself</li>
+          <li>Composes with any other toolset in the ecosystem</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 18. Structured outputs -->
+<section class="slide">
+  <div class="fr fr-purple">
+    <div class="eyebrow eyebrow-purple">Cross-cutting feature</div>
+    <h2>Structured outputs with Pydantic</h2>
+    <div class="divider"></div>
+    <p class="lead">Every operator that returns more than a string accepts <code style="color:var(--purple);font-family:'Roboto Mono',monospace;">output_type=&lt;BaseModel&gt;</code>. The provider validates, serializes to XCom, and hands the next task a typed object.</p>
+    <div class="cols cols-2" style="margin-top: 10px;">
+      <div>
+<div class="codeblock small"><span class="kw">class</span> <span class="cl">SeverityReport</span>(<span class="cl">BaseModel</span>):
+  severity: <span class="cl">Literal</span>[<span class="st">"low"</span>, <span class="st">"medium"</span>,
+                      <span class="st">"high"</span>, <span class="st">"critical"</span>]
+  summary: <span class="cl">str</span>
+  affected_systems: <span class="cl">list</span>[<span class="cl">str</span>]
+  recommended_action: <span class="cl">str</span>
+
+<span class="dc">@task.llm</span>(
+  <span class="nm">output_type</span>=<span class="cl">SeverityReport</span>,
+  ...,
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Payoff</div>
+        <ul class="tight">
+          <li>Downstream code is plain Python, not regex on a string</li>
+          <li>Model mistakes fail loud, at validation, not silently</li>
+          <li>Models reusable across dags and review surfaces</li>
+          <li>Deterministic branching on enum-typed fields</li>
+          <li>Works with LLMOperator, AgentOperator, LLMFileAnalysisOperator, and PydanticAIHook</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 19. Multi-toolset composition -->
+<section class="slide">
+  <div class="fr fr-teal">
+    <div class="eyebrow">Cross-cutting feature</div>
+    <h2>Compose toolsets on one agent</h2>
+    <div class="divider"></div>
+    <p class="lead">Pass a list of toolsets to one agent. Each tool is auto-namespaced; the model chooses. Wrap any toolset in <code style="color:var(--teal);font-family:'Roboto Mono',monospace;">LoggingToolset</code> to get a full trace.</p>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">agent = <span class="cl">AgentOperator</span>(
+  <span class="nm">task_id</span>=<span class="st">"cross_reference"</span>,
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">toolsets</span>=[
+    <span class="cl">LoggingToolset</span>(
+      <span class="nm">wrapped</span>=<span class="cl">SQLToolset</span>(
+        <span class="nm">db_conn_id</span>=<span class="st">"warehouse"</span>,
+        <span class="nm">allowed_tables</span>=[<span class="st">"users"</span>],
+      ),
+    ),
+    <span class="cl">HookToolset</span>(
+      <span class="nm">hook</span>=<span class="cl">FSHook</span>(...),
+      <span class="nm">allowed_methods</span>=[<span class="st">"get_path"</span>],
+    ),
+    <span class="cl">MCPToolset</span>(
+      <span class="nm">mcp_conn_id</span>=<span class="st">"mcp_default"</span>,
+    ),
+  ],
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Why compose</div>
+        <ul class="tight">
+          <li>One agent reasons across SQL, files, and MCP tools in a single task</li>
+          <li>Each toolset brings its own safety rails</li>
+          <li>Swap a toolset without touching agent code</li>
+        </ul>
+        <div class="callout" style="margin-top: 10px; font-size: 11.5px;">The agent decides which tool to call at each turn. Model-provided arguments are validated against each tool's typed signature.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 20. HITL review -->
+<section class="slide">
+  <div class="fr fr-green">
+    <div class="eyebrow eyebrow-green">Plugin feature</div>
+    <h2>Human-in-the-loop review</h2>
+    <div class="divider"></div>
+    <p class="lead">Set one flag and the agent pauses on its proposed output, waiting for a human to approve, reject, or request changes via the built-in <code style="color:var(--green);font-family:'Roboto Mono',monospace;">/hitl-review</code> FastAPI plugin on the Airflow API server.</p>
+    <div class="cols cols-2">
+      <div>
+<div class="codeblock small">agent = <span class="cl">AgentOperator</span>(
+  <span class="nm">task_id</span>=<span class="st">"risky_action"</span>,
+  <span class="nm">llm_conn_id</span>=<span class="st">"pydanticai_default"</span>,
+  <span class="nm">toolsets</span>=[...],
+  <span class="nm">enable_hitl_review</span>=<span class="kw">True</span>,
+  <span class="nm">max_hitl_iterations</span>=<span class="nu">3</span>,
+  <span class="nm">hitl_timeout</span>=timedelta(<span class="nm">hours</span>=<span class="nu">1</span>),
+  <span class="nm">hitl_poll_interval</span>=<span class="nu">10</span>,
+)</div>
+      </div>
+      <div>
+        <div class="mini-h">Agent-side flags</div>
+        <div class="kv">
+          <div class="k">enable_hitl_review</div><div class="v">turn it on</div>
+          <div class="k">max_hitl_iterations</div><div class="v">bounded retries after rejects</div>
+          <div class="k">hitl_timeout</div><div class="v">abort if no decision</div>
+          <div class="k">hitl_poll_interval</div><div class="v">how often to check</div>
+        </div>
+        <div class="mini-h" style="margin-top: 10px;">Reviewer UI</div>
+        <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+          <span class="feat-pill"><span class="feat-dot dot-green"></span>Approve</span>
+          <span class="feat-pill"><span class="feat-dot dot-red"></span>Reject</span>
+          <span class="feat-pill"><span class="feat-dot dot-gold"></span>Request changes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 21. Provider surface coverage -->
+<section class="slide">
+  <div class="fr fr-green">
+    <div class="eyebrow eyebrow-green">At a glance</div>
+    <h2>What you can build</h2>
+    <div class="divider"></div>
+    <div class="grid-covered">
+      <div class="row">LLMOperator / @task.llm <span class="check">&check;</span></div>
+      <div class="row">LLMFileAnalysisOperator <span class="check">&check;</span></div>
+      <div class="row">LLMBranchOperator <span class="check">&check;</span></div>
+      <div class="row">LLMSQLQueryOperator <span class="check">&check;</span></div>
+      <div class="row">LLMSchemaCompareOperator <span class="check">&check;</span></div>
+      <div class="row">AgentOperator / @task.agent <span class="check">&check;</span></div>
+      <div class="row">PydanticAIHook <span class="check">&check;</span></div>
+      <div class="row">MCPHook <span class="check">&check;</span></div>
+      <div class="row">pydanticai connection <span class="check">&check;</span></div>
+      <div class="row">mcp connection (stdio) <span class="check">&check;</span></div>
+      <div class="row">mcp connection (http) <span class="check">&check;</span></div>
+      <div class="row">HookToolset <span class="check">&check;</span></div>
+      <div class="row">SQLToolset <span class="check">&check;</span></div>
+      <div class="row">DataFusionToolset <span class="check">&check;</span></div>
+      <div class="row">MCPToolset <span class="check">&check;</span></div>
+      <div class="row">LoggingToolset <span class="check">&check;</span></div>
+      <div class="row">Multi-toolset composition <span class="check">&check;</span></div>
+      <div class="row">Pydantic output_type <span class="check">&check;</span></div>
+      <div class="row">HITL review plugin <span class="check">&check;</span></div>
+      <div class="row">Any pydantic-ai model <span class="check">&check;</span></div>
+      <div class="row">Airflow XCom / retries <span class="check">&check;</span></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+
+function go(n) {
+  if (n < 0 || n >= total) return;
+  cur = n;
+  slides.forEach((s, i) => s.classList.toggle('active', i === cur));
+  document.getElementById('prog').style.width = ((cur / (total - 1)) * 100) + '%';
+  document.getElementById('snum').textContent = (cur + 1) + ' / ' + total;
+}
+function advance() { go(cur + 1); }
+function retreat() { go(cur - 1); }
+
+document.addEventListener('keydown', e => {
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); advance(); }
+  if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); retreat(); }
+  if (e.key === 'Home') { e.preventDefault(); go(0); }
+  if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+});
+
+let touchY = 0;
+document.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; });
+document.addEventListener('touchend', e => {
+  const d = touchY - e.changedTouches[0].clientY;
+  if (Math.abs(d) > 40) d > 0 ? advance() : retreat();
+});
+
+document.addEventListener('click', e => {
+  if (e.target.closest('.fr')) return;
+  if (e.clientX > innerWidth / 2) advance(); else retreat();
+});
+
+go(0);
+
+const c = document.getElementById('sky'), ctx = c.getContext('2d');
+let W, H;
+function resize() { W = c.width = innerWidth; H = c.height = innerHeight; }
+addEventListener('resize', resize); resize();
+
+const STARS = [];
+for (let i = 0; i < 220; i++) STARS.push({
+  x: Math.random(), y: Math.random(),
+  r: Math.random() * 1.4 + .3,
+  ph: Math.random() * 6.28,
+  sp: Math.random() * .012 + .003,
+  col: ['#E8E0D5','#E8E0D5','#E8E0D5','#FFB32D','#13BDD7','#872DED'][Math.floor(Math.random()*6)]
+});
+
+const CX = () => W * .72, CY = () => H * .52;
+const orbits = [
+  { rx:.22, ry:.085, tilt:-.15, sp:.0004, ph:0,  dotR:10, col:'#FFB32D' },
+  { rx:.16, ry:.062, tilt:-.08, sp:.0007, ph:2,  dotR:8,  col:'#13BDD7' },
+  { rx:.30, ry:.115, tilt:-.22, sp:.00025,ph:4,  dotR:10, col:'#F03A47' },
+  { rx:.11, ry:.04,  tilt:-.04, sp:.0012, ph:1,  dotR:7,  col:'#19BA5A' },
+  { rx:.37, ry:.14,  tilt:-.28, sp:.00015,ph:3,  dotR:9,  col:'#2676FF' },
+  { rx:.06, ry:.024, tilt:.02,  sp:.002,  ph:5,  dotR:5,  col:'#872DED' },
+];
+
+function draw() {
+  requestAnimationFrame(draw);
+  ctx.clearRect(0, 0, W, H);
+
+  for (const s of STARS) {
+    s.ph += s.sp;
+    const op = .3 + Math.sin(s.ph) * .3;
+    ctx.globalAlpha = Math.max(0, op);
+    ctx.fillStyle = s.col;
+    ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, 6.28); ctx.fill();
+  }
+
+  const ox = CX(), oy = CY();
+  for (const o of orbits) {
+    ctx.save(); ctx.translate(ox, oy); ctx.rotate(o.tilt);
+    ctx.globalAlpha = .05; ctx.strokeStyle = '#E8E0D5'; ctx.lineWidth = .7;
+    ctx.beginPath(); ctx.ellipse(0, 0, o.rx*W, o.ry*H, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+  }
+
+  for (const o of orbits) {
+    o.ph += o.sp;
+    const rx = o.rx*W, ry = o.ry*H;
+    const lx = Math.cos(o.ph)*rx, ly = Math.sin(o.ph)*ry;
+    const px = ox + lx*Math.cos(o.tilt) - ly*Math.sin(o.tilt);
+    const py = oy + lx*Math.sin(o.tilt) + ly*Math.cos(o.tilt);
+
+    ctx.globalAlpha = .10;
+    const g2 = ctx.createRadialGradient(px,py,0,px,py,o.dotR*6);
+    g2.addColorStop(0, o.col); g2.addColorStop(1, 'transparent');
+    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(px,py,o.dotR*6,0,6.28); ctx.fill();
+
+    ctx.globalAlpha = .9; ctx.fillStyle = o.col;
+    ctx.beginPath(); ctx.arc(px,py,o.dotR,0,6.28); ctx.fill();
+
+    ctx.globalAlpha = .35; ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(px-o.dotR*.3,py-o.dotR*.3,o.dotR*.35,0,6.28); ctx.fill();
+  }
+
+  if (Math.random() < .004) {
+    const sx = Math.random()*W, sy = Math.random()*H*.4;
+    const len = 90+Math.random()*140, ang = .5+Math.random()*.5;
+    const ex = sx+Math.cos(ang)*len, ey = sy+Math.sin(ang)*len;
+    const gr = ctx.createLinearGradient(sx,sy,ex,ey);
+    gr.addColorStop(0,'rgba(232,224,213,.6)'); gr.addColorStop(1,'rgba(232,224,213,0)');
+    ctx.globalAlpha = 1; ctx.strokeStyle = gr; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke();
+  }
+}
+draw();
+</script>
+</body>
+</html>
