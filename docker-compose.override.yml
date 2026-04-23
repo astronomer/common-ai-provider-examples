@@ -1,0 +1,13 @@
+services:
+  api-server:
+    environment:
+      AIRFLOW__API__BASE_URL: "http://common-ai-provider-example-dags.localhost:6563"
+  scheduler:
+    environment:
+      AIRFLOW__API__BASE_URL: "http://common-ai-provider-example-dags.localhost:6563"
+  dag-processor:
+    environment:
+      AIRFLOW__API__BASE_URL: "http://common-ai-provider-example-dags.localhost:6563"
+  triggerer:
+    environment:
+      AIRFLOW__API__BASE_URL: "http://common-ai-provider-example-dags.localhost:6563"
