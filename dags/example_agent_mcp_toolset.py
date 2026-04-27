@@ -1,7 +1,7 @@
 """
 ## example_agent_mcp_toolset
 
-Demonstrates `AgentOperator` + `MCPToolset`. The `mcp_stdio_space` connection
+Demonstrates `@task.agent` + `MCPToolset`. The `mcp_stdio_space` connection
 launches `include/mcp_server/space_server.py` as a subprocess; the agent can
 call `list_planets`, `list_spacecraft`, and `count_stations_by_planet`
 through the MCP protocol.
@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from airflow.providers.common.ai.operators.agent import AgentOperator
 from airflow.providers.common.ai.toolsets.mcp import MCPToolset
 from airflow.sdk import dag, task
 
@@ -20,7 +19,6 @@ from airflow.sdk import dag, task
     dag_id="example_agent_mcp_toolset",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "agent", "mcp-toolset"],
     doc_md=__doc__,
 )
@@ -33,9 +31,7 @@ def example_agent_mcp_toolset():
             "counts in your answer."
         )
 
-    ask_mcp_agent = AgentOperator(
-        task_id="ask_mcp_agent",
-        prompt="{{ ti.xcom_pull(task_ids='prepare_input') }}",
+    @task.agent(
         llm_conn_id="pydanticai_default",
         system_prompt=(
             "You are a space-logistics analyst with access to the "
@@ -43,14 +39,14 @@ def example_agent_mcp_toolset():
         ),
         toolsets=[MCPToolset(mcp_conn_id="mcp_stdio_space")],
     )
+    def ask_mcp_agent(question: str) -> str:
+        return question
 
     @task
     def consume_output(answer: str) -> None:
         print(f"MCP agent answer:\n{answer}")
 
-    question = prepare_input()
-    question >> ask_mcp_agent
-    consume_output(ask_mcp_agent.output)
+    consume_output(ask_mcp_agent(prepare_input()))
 
 
 example_agent_mcp_toolset()

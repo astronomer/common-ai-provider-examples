@@ -1,7 +1,7 @@
 """
 ## example_agent_sql_toolset
 
-Demonstrates `AgentOperator` + `SQLToolset`. The agent is given access to
+Demonstrates `@task.agent` + `SQLToolset`. The agent is given access to
 `list_tables`, `get_schema`, `query`, and `check_query` against the seeded
 `space_logistics` SQLite DB and answers a shipping question.
 """
@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from airflow.providers.common.ai.operators.agent import AgentOperator
 from airflow.providers.common.ai.toolsets.sql import SQLToolset
 from airflow.sdk import dag, task
 
@@ -22,7 +21,6 @@ from include.seed import seed_primary
     dag_id="example_agent_sql_toolset",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "agent", "sql-toolset"],
     doc_md=__doc__,
 )
@@ -36,9 +34,7 @@ def example_agent_sql_toolset():
             "operational space_station. Return the RouteAnswer structure."
         )
 
-    answer_route_question = AgentOperator(
-        task_id="answer_route_question",
-        prompt="{{ ti.xcom_pull(task_ids='prepare_input') }}",
+    @task.agent(
         llm_conn_id="pydanticai_default",
         system_prompt=(
             "You are a SQL analyst for an interplanetary freight line. "
@@ -54,6 +50,8 @@ def example_agent_sql_toolset():
             )
         ],
     )
+    def answer_route_question(question: str) -> str:
+        return question
 
     @task
     def consume_output(answer: RouteAnswer | dict) -> None:
@@ -64,9 +62,7 @@ def example_agent_sql_toolset():
             print(f"  - {route}")
         print(f"Rationale: {answer.rationale}")
 
-    question = prepare_input()
-    question >> answer_route_question
-    consume_output(answer_route_question.output)
+    consume_output(answer_route_question(prepare_input()))
 
 
 example_agent_sql_toolset()

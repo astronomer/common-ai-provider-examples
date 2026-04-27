@@ -1,7 +1,7 @@
 """
 ## example_agent_datafusion_toolset
 
-Demonstrates `AgentOperator` + `DataFusionToolset`. A pre-task writes the
+Demonstrates `@task.agent` + `DataFusionToolset`. A pre-task writes the
 shipping_routes CSV to `/tmp/fusion/` so DataFusion can query it; the agent
 then computes aggregate stats without an external warehouse.
 """
@@ -12,7 +12,6 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from airflow.providers.common.ai.operators.agent import AgentOperator
 from airflow.providers.common.ai.toolsets.datafusion import DataFusionToolset
 from airflow.providers.common.sql.datafusion.engine import DataSourceConfig
 from airflow.sdk import dag, task
@@ -26,7 +25,6 @@ SRC = Path("/usr/local/airflow/include/csvs/shipping_routes.csv")
     dag_id="example_agent_datafusion_toolset",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "agent", "datafusion-toolset"],
     doc_md=__doc__,
 )
@@ -42,9 +40,7 @@ def example_agent_datafusion_toolset():
             "average avg_duration_hours for routes where is_active = 'true'."
         )
 
-    analyze_routes = AgentOperator(
-        task_id="analyze_routes",
-        prompt="{{ ti.xcom_pull(task_ids='prepare_input') }}",
+    @task.agent(
         llm_conn_id="pydanticai_default",
         system_prompt=(
             "You are a data analyst. Use the datafusion tools to register "
@@ -63,14 +59,14 @@ def example_agent_datafusion_toolset():
             )
         ],
     )
+    def analyze_routes(question: str) -> str:
+        return question
 
     @task
     def consume_output(answer: str) -> None:
         print(f"DataFusion agent answer:\n{answer}")
 
-    question = prepare_input()
-    question >> analyze_routes
-    consume_output(analyze_routes.output)
+    consume_output(analyze_routes(prepare_input()))
 
 
 example_agent_datafusion_toolset()

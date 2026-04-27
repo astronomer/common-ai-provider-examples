@@ -25,7 +25,6 @@ FIXTURE = Path("/usr/local/airflow/include/fixtures/anomaly_report.md")
     dag_id="example_llm_operator",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "llm"],
     doc_md=__doc__,
 )
@@ -41,6 +40,9 @@ def example_llm_operator():
             "reports into a strict SeverityReport object."
         ),
         output_type=SeverityReport,
+        agent_params={
+            "temperature": 0.0,
+        },
     )
     def summarize(report_text: str) -> str:
         return (

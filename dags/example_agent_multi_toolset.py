@@ -1,7 +1,7 @@
 """
 ## example_agent_multi_toolset
 
-Demonstrates an `AgentOperator` composed with multiple toolsets at once:
+Demonstrates `@task.agent` composed with multiple toolsets at once:
 `SQLToolset` for the warehouse, `HookToolset` for the fixtures filesystem,
 and a `LoggingToolset` wrapper for observability.
 """
@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from airflow.providers.common.ai.operators.agent import AgentOperator
 from airflow.providers.common.ai.toolsets.hook import HookToolset
 from airflow.providers.common.ai.toolsets.logging import LoggingToolset
 from airflow.providers.common.ai.toolsets.sql import SQLToolset
@@ -24,7 +23,6 @@ from include.seed import seed_primary
     dag_id="example_agent_multi_toolset",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "agent", "multi-toolset"],
     doc_md=__doc__,
 )
@@ -39,9 +37,7 @@ def example_agent_multi_toolset():
             "short bulleted report."
         )
 
-    cross_reference = AgentOperator(
-        task_id="cross_reference",
-        prompt="{{ ti.xcom_pull(task_ids='prepare_input') }}",
+    @task.agent(
         llm_conn_id="pydanticai_default",
         system_prompt=(
             "You are an ops analyst. Use SQL tools for warehouse lookups and "
@@ -60,14 +56,14 @@ def example_agent_multi_toolset():
             ),
         ],
     )
+    def cross_reference(question: str) -> str:
+        return question
 
     @task
     def consume_output(answer: str) -> None:
         print(f"Cross-reference report:\n{answer}")
 
-    question = prepare_input()
-    question >> cross_reference
-    consume_output(cross_reference.output)
+    consume_output(cross_reference(prepare_input()))
 
 
 example_agent_multi_toolset()

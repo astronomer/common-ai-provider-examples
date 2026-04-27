@@ -26,7 +26,6 @@ QUESTION = (
     dag_id="example_llm_sql_query",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "llm-sql"],
     doc_md=__doc__,
 )
@@ -42,6 +41,8 @@ def example_llm_sql_query():
         db_conn_id="space_logistics",
         table_names=["spacecraft"],
         dialect="sqlite",
+        require_approval=True,
+        allow_modifications=True,
     )
     def generate_sql(question: str) -> str:
         return question

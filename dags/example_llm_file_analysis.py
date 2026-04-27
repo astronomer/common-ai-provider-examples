@@ -23,7 +23,6 @@ FIXTURE_PATH = "file:///usr/local/airflow/include/fixtures/anomaly_report.log"
     dag_id="example_llm_file_analysis",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "llm-file-analysis"],
     doc_md=__doc__,
 )

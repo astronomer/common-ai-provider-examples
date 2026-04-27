@@ -22,7 +22,6 @@ MANIFEST_DIR = Path("/usr/local/airflow/include/fixtures/cargo_manifests")
     dag_id="example_llm_branch",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "llm-branch"],
     doc_md=__doc__,
 )

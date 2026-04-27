@@ -1,7 +1,7 @@
 """
 ## example_agent_basic
 
-Demonstrates `@task.agent` / `AgentOperator` with no toolsets and a
+Demonstrates `@task.agent` with no toolsets and a
 Pydantic `output_type` (`MissionPlan`). Showcases multi-turn reasoning on
 a self-contained prompt.
 """
@@ -19,7 +19,6 @@ from include.models import MissionPlan
     dag_id="example_agent_basic",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "agent"],
     doc_md=__doc__,
 )

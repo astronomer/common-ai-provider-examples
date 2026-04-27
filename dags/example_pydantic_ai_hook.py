@@ -22,7 +22,6 @@ from include.models import SeverityReport
     dag_id="example_pydantic_ai_hook",
     start_date=datetime(2026, 1, 1),
     schedule=None,
-    catchup=False,
     tags=["common-ai", "example", "space", "hook"],
     doc_md=__doc__,
 )
