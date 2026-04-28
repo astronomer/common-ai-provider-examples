@@ -52,7 +52,7 @@ iss_toolset = IssOpenNotifyToolset()
 @dag(
     dag_id="example_agent_advanced",
     start_date=datetime(2026, 1, 1),
-    schedule="* * * * *",
+    schedule=None,
     tags=["common-ai", "example", "space", "agent", "agent-advanced"],
     doc_md=__doc__,
 )
