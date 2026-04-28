@@ -40,9 +40,7 @@ def example_llm_operator():
             "reports into a strict SeverityReport object."
         ),
         output_type=SeverityReport,
-        agent_params={
-            "temperature": 0.0,
-        },
+        agent_params={},
     )
     def summarize(report_text: str) -> str:
         return (
