@@ -9,7 +9,6 @@ themed around space logistics.
 > connections, and HITL — see the Astronomer guide:
 > [Airflow Common AI provider](https://www.astronomer.io/docs/learn/airflow-common-ai-provider).**
 
----
 
 Quick start
 -----------
