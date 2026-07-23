@@ -1,9 +1,0 @@
-current-instance: local
-instances:
-- auth:
-    kind: basic
-    password: admin
-    username: admin
-  name: local
-  source: manual
-  url: http://common-ai-provider-example-dags.localhost:6563
