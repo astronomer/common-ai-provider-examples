@@ -7,6 +7,7 @@ then executes the generated SQL in a downstream task.
 """
 
 from __future__ import annotations
+from sqlglot import exp
 
 import sqlite3
 from datetime import datetime
@@ -38,14 +39,30 @@ def example_llm_sql_query():
 
     @task.llm_sql(
         llm_conn_id="pydanticai_default",
+        system_prompt=(
+            "Prefer indexed columns in "
+            "filters and joins. "
+            "Avoid SELECT *."
+        ),
+        validate_sql=True,
+        dialect="sqlite",
         db_conn_id="space_logistics",
         table_names=["spacecraft"],
-        dialect="sqlite",
         require_approval=True,
         allow_modifications=True,
+        allowed_sql_types=(
+            exp.Select,
+            exp.Union,
+            exp.Intersect,
+            exp.Except,
+            exp.Insert,
+            exp.Update,
+        ),
     )
     def generate_sql(question: str) -> str:
         return question
+
+    _generate_sql = generate_sql(prepare_input())
 
     @task
     def consume_output(sql: str) -> list[tuple]:
@@ -56,7 +73,7 @@ def example_llm_sql_query():
             print(row)
         return rows
 
-    consume_output(generate_sql(prepare_input()))
+    consume_output(_generate_sql)
 
 
 example_llm_sql_query()

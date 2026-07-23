@@ -11,3 +11,13 @@
 #   triggerer:
 #     environment:
 #       AIRFLOW__API__BASE_URL: "http://common-ai-provider-example-dags.localhost:6563"
+
+services:
+  temporal:
+    image: temporalio/temporal:1.7.2
+    command: ["server", "start-dev", "--ip", "0.0.0.0"]
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    networks:
+      - airflow

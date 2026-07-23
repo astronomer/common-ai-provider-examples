@@ -32,18 +32,21 @@ def example_llm_schema_compare():
 
     @task.llm_schema_compare(
         llm_conn_id="pydanticai_default",
-        db_conn_ids=["space_logistics", "space_logistics_alt"],
+        db_conn_ids=[
+            "space_logistics",
+            "space_logistics_alt"
+        ],
         table_names=["spacecraft"],
-        context_strategy="full",
     )
     def compare_schemas(_: dict) -> str:
         return (
-            "Compare the `spacecraft` table across both databases. Flag any "
-            "mismatch that would break a CDC pipeline copying rows from the "
+            "Compare the given tables. Flag any "
+            "mismatch that would break a CDC pipeline "
+            "copying rows from the "
             "primary into the alternate warehouse."
         )
 
-    @task
+    @task(trigger_rule="all_done_setup_success")
     def consume_output(report: dict) -> None:
         print(f"Compatible:   {report.get('compatible')}")
         for mismatch in report.get("mismatches", []) or []:

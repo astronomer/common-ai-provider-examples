@@ -14,6 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from airflow.sdk import dag, task
+from pydantic_ai.usage import UsageLimits
 
 from include.models import SeverityReport
 
@@ -36,16 +37,22 @@ def example_llm_operator():
     @task.llm(
         llm_conn_id="pydanticai_default",
         system_prompt=(
-            "You are a fleet safety officer. Summarize spacecraft anomaly "
-            "reports into a strict SeverityReport object."
+            "You are a fleet safety officer. "
+            "Summarize spacecraft anomaly "
+            "reports into a strict "
+            "SeverityReport object."
         ),
         output_type=SeverityReport,
-        agent_params={},
+        require_approval=True,
+        allow_modifications=True,
+        usage_limits=UsageLimits(request_limit=3, total_tokens_limit=4000),
     )
     def summarize(report_text: str) -> str:
         return (
-            "Summarize the following mission anomaly report. "
-            "Pick the single overall severity.\n\n"
+            "Summarize the following "
+            "mission anomaly report in one paragraph. "
+            "Pick the single overall "
+            "severity.\n\n"
             f"REPORT:\n{report_text}"
         )
 

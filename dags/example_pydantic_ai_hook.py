@@ -19,13 +19,13 @@ from include.models import SeverityReport
 
 
 @dag(
-    dag_id="example_pydantic_ai_hook",
+    dag_id="onboard_employee",
     start_date=datetime(2026, 1, 1),
     schedule=None,
     tags=["common-ai", "example", "space", "hook"],
     doc_md=__doc__,
 )
-def example_pydantic_ai_hook():
+def onboard_employee():
     @task
     def prepare_input() -> str:
         return (
@@ -58,4 +58,4 @@ def example_pydantic_ai_hook():
     consume_output(run_agent(prepare_input()))
 
 
-example_pydantic_ai_hook()
+onboard_employee()

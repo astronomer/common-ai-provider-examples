@@ -12,7 +12,7 @@ import random
 from datetime import datetime
 from pathlib import Path
 
-from airflow.sdk import dag, task
+from airflow.sdk import dag, task, chain
 
 
 MANIFEST_DIR = Path("/usr/local/airflow/include/fixtures/cargo_manifests")
@@ -36,30 +36,37 @@ def example_llm_branch():
     @task.llm_branch(
         llm_conn_id="pydanticai_default",
         system_prompt=(
-            "You are customs control at Earth Spacedock. Route each inbound "
-            "cargo manifest to exactly one handling lane. Use 'fast_lane' for "
-            "cleanly declared, low-hazard cargo, 'customs_review' when "
-            "paperwork is incomplete or items are ambiguous, and 'quarantine' "
-            "when hazards, expired certifications, or unregistered origins "
-            "are present."
+            "Route each inbound cargo "
+            "manifest to exactly one handling "
+            "lane. Use 'fast_lane' for "
+            "properly declared, low-hazard "
+            "cargo, 'customs_review' when "
+            "paperwork is incomplete or items "
+            "are ambiguous, and 'send_back' "
+            "when payment information is missing."
         ),
+        allow_multiple_branches=False,
     )
     def route_cargo(manifest_json: str) -> str:
         return f"Route this cargo manifest:\n{manifest_json}"
 
     @task
-    def fast_lane() -> None:
-        print("Cargo cleared via fast lane.")
+    def fast_lane() -> None: ...
 
     @task
-    def customs_review() -> None:
-        print("Cargo held for customs review.")
+    def customs_review() -> None: ...
 
     @task
-    def quarantine() -> None:
-        print("Cargo placed in hazmat quarantine.")
+    def send_back() -> None: ...
 
-    route_cargo(prepare_input()) >> [fast_lane(), customs_review(), quarantine()]
+    chain(
+        route_cargo(prepare_input()), 
+        [
+            fast_lane(),
+            customs_review(),
+            send_back(),
+        ]
+    )
 
 
 example_llm_branch()

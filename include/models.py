@@ -38,3 +38,11 @@ class RouteAnswer(BaseModel):
     question: str
     top_routes: list[str]
     rationale: str
+
+
+class TicketResponse(BaseModel):
+    summary: str
+    response: str
+    priority: Literal["low", "medium", "high"]
+    confidence_score: float = Field(ge=0.0, le=1.0)
+    suggested_tags: list[str]

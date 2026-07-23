@@ -1,0 +1,52 @@
+{
+  "SHP-1001": {
+    "shipment_id": "SHP-1001",
+    "status": "delayed",
+    "origin": "Earth Spacedock",
+    "destination": "Ceres Depot",
+    "carrier_spacecraft": "MV Long Haul",
+    "eta_utc": "2026-07-19T08:00:00Z",
+    "last_checkpoint": "Mars Orbital Relay, 2026-07-02T14:30:00Z",
+    "notes": "Rerouted around solar flare activity; 4 day delay against original ETA."
+  },
+  "SHP-1002": {
+    "shipment_id": "SHP-1002",
+    "status": "delivered",
+    "origin": "Luna Freight Yard",
+    "destination": "Europa Research Station",
+    "carrier_spacecraft": "MV Pale Blue",
+    "eta_utc": "2026-06-28T11:00:00Z",
+    "last_checkpoint": "Delivered at Europa Research Station dock 3, 2026-06-28T10:41:00Z",
+    "notes": "Handling incident logged at Luna Freight Yard during loading; damage claim eligible."
+  },
+  "SHP-1003": {
+    "shipment_id": "SHP-1003",
+    "status": "customs_hold",
+    "origin": "Titan Refinery",
+    "destination": "Mars Colony One",
+    "carrier_spacecraft": "MV Ring Runner",
+    "eta_utc": "2026-07-11T16:00:00Z",
+    "last_checkpoint": "Mars Orbital Customs, 2026-07-03T09:15:00Z",
+    "notes": "Held pending updated hazardous-materials declaration for compressed methane cells."
+  },
+  "SHP-1004": {
+    "shipment_id": "SHP-1004",
+    "status": "in_transit",
+    "origin": "Earth Spacedock",
+    "destination": "Ganymede Hub",
+    "carrier_spacecraft": "MV Stellar Wind",
+    "eta_utc": "2026-07-25T22:00:00Z",
+    "last_checkpoint": "Asteroid Belt Waypoint 7, 2026-07-04T03:50:00Z",
+    "notes": "Fuel surcharge of 240 credits applied per Q3 tariff update effective 2026-07-01."
+  },
+  "SHP-1005": {
+    "shipment_id": "SHP-1005",
+    "status": "misrouted",
+    "origin": "Venus Cloud Port",
+    "destination": "Phobos Transfer Station",
+    "carrier_spacecraft": "MV Morning Star",
+    "eta_utc": "2026-07-15T05:00:00Z",
+    "last_checkpoint": "Deimos Sorting Facility, 2026-07-01T19:20:00Z",
+    "notes": "Container scanned at wrong sorting facility; recovery transfer scheduled 2026-07-06."
+  }
+}

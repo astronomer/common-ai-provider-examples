@@ -16,7 +16,7 @@ from airflow.sdk import dag, task
 from include.models import FileAnalysisReport
 
 
-FIXTURE_PATH = "file:///usr/local/airflow/include/fixtures/anomaly_report.log"
+FIXTURE_PATH = "file:///usr/local/airflow/include/ship_reports/"
 
 
 @dag(
@@ -29,21 +29,28 @@ FIXTURE_PATH = "file:///usr/local/airflow/include/fixtures/anomaly_report.log"
 def example_llm_file_analysis():
     @task
     def prepare_input() -> str:
-        local = Path("/usr/local/airflow/include/fixtures/anomaly_report.log")
+        local = Path("/usr/local/airflow/include/ship_reports/")
         assert local.exists(), f"missing fixture: {local}"
         print(f"Staging file: {local} (size={local.stat().st_size} bytes)")
         return FIXTURE_PATH
 
     @task.llm_file_analysis(
         llm_conn_id="pydanticai_default",
-        file_path=FIXTURE_PATH,
+        file_path="s3://ship_reports/",
+        file_conn_id="aws_default",
+        max_files=100,
+        max_file_size_bytes=1024 * 1024 * 10,
+        max_text_chars=200000,
         output_type=FileAnalysisReport,
+        multi_modal=True,
     )
     def analyze_log() -> str:
         return (
-            "Read the mission log and return a structured FileAnalysisReport "
-            "containing every distinct anomaly with an anomaly_type, a "
-            "confidence score in [0, 1], and free-form notes."
+            "Read the mission log and return "
+            "a structured FileAnalysisReport "
+            "containing every distinct anomaly "
+            "with an anomaly_type, a confidence "
+            "score in [0, 1], and free-form notes."
         )
 
     @task

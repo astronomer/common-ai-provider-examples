@@ -104,5 +104,32 @@ Adapting to your stack
 - **Plug in your MCP server:** update `mcp_default` (HTTP) or
   `mcp_stdio_space` (stdio command/args).
 
+---
+
+Agent framework comparison: the same Dag six ways
+-------------------------------------------------
+
+Six Dags implement the identical support-ticket flow (fetch ticket -> draft a
+structured `TicketResponse` with a `lookup_shipment` tool -> HITL review
+branch). Only the `generate_ai_response` task differs — diff any two files to
+see exactly what each framework changes.
+
+| Dag | File | Framework |
+|---|---|---|
+| `ai_support_ticket_system` | `dags/ai_support_ticket_system.py` | common-ai provider (`@task.agent`) — baseline |
+| `support_ticket_pydantic_ai` | `dags/micro_orchestrators/pydanticAI_dag.py` | pydantic-ai used directly |
+| `support_ticket_langgraph` | `dags/micro_orchestrators/langc_dag.py` | LangGraph ReAct agent |
+| `support_ticket_crewai` | `dags/micro_orchestrators/crewAI_dag.py` | CrewAI single-agent crew |
+| `support_ticket_temporal` | `dags/micro_orchestrators/temporal_dag.py` | Temporal workflow (dev server in `docker-compose.override.yml`) |
+| `support_ticket_direct_api` | `dags/micro_orchestrators/direct_api_call.py` | OpenAI SDK, hand-written tool loop |
+
+Shared pieces live in `include/custom_functions.py`,
+`include/fixtures/shipments.json`, and `include/models.py` (`TicketResponse`).
+All six use `gpt-5-mini` via `OPENAI_API_KEY` so the comparison is
+apples-to-apples; the baseline additionally goes through the
+`pydanticai_default` connection. The Temporal Dag needs the `temporal` service
+from `docker-compose.override.yml` (`astro dev restart` picks it up); its web
+UI is at `http://localhost:8233`.
+
 For deeper context on any of the above, see the
 [Astronomer guide](https://www.astronomer.io/docs/learn/airflow-common-ai-provider).
