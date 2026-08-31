@@ -1,0 +1,56 @@
+"""
+## example_agent_hook_toolset
+
+`@task.agent` with `HookToolset`, which turns the public methods of any Airflow
+Hook into agent tools. Here the filesystem Hook points at `include/fixtures/`
+and the agent uses it to find and read files.
+"""
+
+from __future__ import annotations
+
+from airflow.providers.common.ai.toolsets.hook import HookToolset
+from airflow.sdk import dag, task
+
+from include.fixtures_hook import FixturesHook
+
+
+@dag(
+    dag_id="example_agent_hook_toolset",
+    tags=["common-ai", "feature-example", "task.agent", "hook-toolset"],
+    doc_md=__doc__,
+)
+def example_agent_hook_toolset():
+    @task
+    def prepare_input() -> str:
+        return (
+            "List every cargo manifest file available under the fixtures "
+            "filesystem and name the one with the highest declared hazard."
+        )
+
+    @task.agent(
+        llm_conn_id="pydanticai_default",
+        system_prompt=(
+            "You are a customs inspector. Use the filesystem hook tools to "
+            "complete the task autonomously — do NOT ask the user for "
+            "confirmation. Call list_files(subdir='cargo_manifests') to "
+            "enumerate manifests, then read_file(relative_path=...) on each "
+            "one, then answer the question with your conclusion."
+        ),
+        toolsets=[
+            HookToolset(
+                hook=FixturesHook(fs_conn_id="fixtures_fs"),
+                allowed_methods=["list_files", "read_file"],
+            )
+        ],
+    )
+    def inventory_manifests(question: str) -> str:
+        return question
+
+    @task
+    def consume_output(answer: str) -> None:
+        print(f"Agent answer:\n{answer}")
+
+    consume_output(inventory_manifests(prepare_input()))
+
+
+example_agent_hook_toolset()

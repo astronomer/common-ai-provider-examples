@@ -1,135 +1,121 @@
 Common AI Provider Example Dags
 ===============================
 
-Example Airflow Dags covering every user-facing component of
-[`apache-airflow-providers-common-ai`](https://airflow.apache.org/docs/apache-airflow-providers-common-ai/stable/),
-themed around space logistics.
+Example Airflow Dags for
+[`apache-airflow-providers-common-ai`](https://airflow.apache.org/docs/apache-airflow-providers-common-ai/stable/) and
+human-in-the-loop operators from the standard provider.
 
-> **For a full walkthrough of the provider — operators, hooks, toolsets,
-> connections, and HITL — see the Astronomer guide:
-> [Airflow Common AI provider](https://www.astronomer.io/docs/learn/airflow-common-ai-provider).**
+> See [Orchestrate AI tasks with Apache Airflow® and the Common AI provider](https://www.astronomer.io/docs/learn/airflow-common-ai-provider) and [Human-in-the-loop workflows with Airflow](https://www.astronomer.io/docs/learn/airflow-human-in-the-loop) for more information.
 
+Astro Runtime 3.3 (Airflow 3.3). Provider versions are pinned in
+`requirements.txt`.
 
-Quick start
+How to use this repository
 -----------
 
-1. Copy .env_example to .env and add your own credentials
+1. Copy `.env_example` to `.env` and add your own credentials for your model provider, adjust the model in `AIRFLOW_CONN_PYDANTICAI_DEFAULT` if needed.
 2. Start Airflow
 
 ```bash
 astro dev start
 ```
 
-Connections live in `.env` as `AIRFLOW_CONN_*` JSON entries. The
-`pydanticai_default` connection points at `openai:gpt-5-mini`; swap the
-`extra.model` field to target Anthropic, Bedrock, Vertex AI, Ollama, or any
-other pydantic-ai provider — operators are provider-agnostic.
-
 ---
 
-Dags
-----
+Layout
+------
+
+```
+dags/
+  01_llm_tasks/          one Dag per @task.llm* decorator
+  02_agent/              @task.agent, from minimal to every knob turned on
+  03_toolsets/           one Dag per toolset, plus one that combines three
+  04_hitl/               human in the loop, standard operators and agent review
+  05_connections_hooks/  the hook API and the MCP connection transports
+  other/                 end-to-end pipelines built out of the above
+  framework_comparison/  the same Dag six times, once per agent framework
+```
+
+### 01_llm_tasks
 
 | Dag | Provider component |
 |---|---|
-| `example_llm_operator.py` | `LLMOperator` / `@task.llm` + Pydantic `output_type` |
-| `example_llm_branch.py` | `LLMBranchOperator` / `@task.llm_branch` |
-| `example_llm_sql_query.py` | `LLMSQLQueryOperator` / `@task.llm_sql` |
-| `example_llm_file_analysis.py` | `LLMFileAnalysisOperator` / `@task.llm_file_analysis` |
-| `example_llm_schema_compare.py` | `LLMSchemaCompareOperator` |
-| `example_agent_basic.py` | `AgentOperator` / `@task.agent` (no toolset) |
-| `example_agent_basic_durable.py` | `AgentOperator` with `durable=True` (DurableStorage) |
-| `example_agent_advanced.py` | `AgentOperator` with custom `AbstractToolset` + full constructor knobs |
-| `example_agent_sql_toolset.py` | `SQLToolset` |
-| `example_agent_hook_toolset.py` | `HookToolset` |
-| `example_agent_datafusion_toolset.py` | `DataFusionToolset` |
-| `example_agent_mcp_toolset.py` | `MCPToolset` |
-| `example_agent_logging_toolset.py` | `LoggingToolset` |
-| `example_agent_multi_toolset.py` | Multi-toolset composition |
-| `example_agent_hitl_review.py` | HITL review (FastAPI `/hitl-review` plugin) |
-| `example_pydantic_ai_hook.py` | `PydanticAIHook.create_agent()` direct |
-| `example_mcp_connection_transports.py` | `mcp` connection (stdio + http transports) |
+| `example_llm_operator` | `LLMOperator` / `@task.llm` with a Pydantic `output_type` and `UsageLimits` |
+| `example_llm_branch` | `LLMBranchOperator` / `@task.llm_branch` |
+| `example_llm_sql_query` | `LLMSQLQueryOperator` / `@task.llm_sql` |
+| `example_llm_file_analysis` | `LLMFileAnalysisOperator` / `@task.llm_file_analysis` |
+| `example_llm_schema_compare` | `@task.llm_schema_compare` |
 
-Every Dag uses the `pydanticai_default` connection.
+### 02_agent
 
----
+| Dag | Provider component |
+|---|---|
+| `example_agent_basic` | `AgentOperator` / `@task.agent` with no toolset |
+| `example_agent_complex` | `durable`, `usage_limits`, `message_history`, tool logging |
+| `example_agent_advanced` | A custom `AbstractToolset` |
+| `example_agent_basic_durable` | `durable=True` |
+| `example_llm_retry_policy` | `LLMRetryPolicy` |
 
-Project layout
---------------
+### 03_toolsets
 
-```
-dags/                          - example Dags (table above)
-include/
-  models.py                    - shared Pydantic output models
-  seed.py                      - seeds /tmp/space_logistics.db and the drifted alt DB
-  fixtures_hook.py             - FSHook subclass with list_files/read_file for HookToolset
-  iss_open_notify_toolset.py   - custom AbstractToolset used by the advanced agent DAG
-  csvs/                        - space-logistics seed data
-  fixtures/                    - anomaly_report.log, cargo_manifests/*.json, parquet, etc.
-  mcp_server/                  - tiny stdio MCP server (space tools)
-.env_example                   - Add your own credentials and update for your model provider as .env
-docker-compose.override.yml    - optional, pins AIRFLOW__API__BASE_URL to the project subdomain
-                                 so the HITL Review React bundle loads correctly if the URL differs from the default
-requirements.txt               - common-ai provider, sqlite provider, pydantic-ai, datafusion
-```
+| Dag | Toolset |
+|---|---|
+| `example_agent_sql_toolset` | `SQLToolset` |
+| `example_agent_hook_toolset` | `HookToolset`. Any Airflow Hook's methods can become tools |
+| `example_agent_datafusion_toolset` | `DataFusionToolset` |
+| `example_agent_mcp_toolset` | `MCPToolset` |
+| `example_agent_logging_toolset` | `LoggingToolset`|
+| `example_agent_multi_toolset` | SQL, Hook and Logging toolset |
 
----
+### 04_hitl
 
-Running Dags
-------------
-
-All Dags are `schedule=None, catchup=False`. Trigger from the UI or:
-
-```bash
-uvx --from astro-airflow-mcp af runs trigger-wait example_llm_operator
-```
-
-For `example_agent_hitl_review`, after triggering open the task-instance page
-for `review_plan` and click the **HITL Review** tab to approve / reject /
-request changes. The bundled `docker-compose.override.yml` makes that tab
-load on the project subdomain — if you rename the project or change the
-Astro port, update the override.
-
----
-
-Adapting to your stack
-----------------------
-
-- **Swap the LLM:** edit `pydanticai_default.extra.model` (e.g.
-  `anthropic:claude-sonnet-4-6`, `ollama:llama3`). Set the matching API key
-  via the connection or environment.
-- **Swap the warehouse:** point `space_logistics` at Postgres, Snowflake, or
-  BigQuery — no Dag changes needed for the SQL-toolset and schema-compare
-  examples.
-- **Plug in your MCP server:** update `mcp_default` (HTTP) or
-  `mcp_stdio_space` (stdio command/args).
-
----
-
-Agent framework comparison: the same Dag six ways
--------------------------------------------------
-
-Six Dags implement the identical support-ticket flow (fetch ticket -> draft a
-structured `TicketResponse` with a `lookup_shipment` tool -> HITL review
-branch). Only the `generate_ai_response` task differs — diff any two files to
-see exactly what each framework changes.
-
-| Dag | File | Framework |
+| Dag | Operator | Info |
 |---|---|---|
-| `ai_support_ticket_system` | `dags/ai_support_ticket_system.py` | common-ai provider (`@task.agent`) — baseline |
-| `support_ticket_pydantic_ai` | `dags/micro_orchestrators/pydanticAI_dag.py` | pydantic-ai used directly |
-| `support_ticket_langgraph` | `dags/micro_orchestrators/langc_dag.py` | LangGraph ReAct agent |
-| `support_ticket_crewai` | `dags/micro_orchestrators/crewAI_dag.py` | CrewAI single-agent crew |
-| `support_ticket_temporal` | `dags/micro_orchestrators/temporal_dag.py` | Temporal workflow (dev server in `docker-compose.override.yml`) |
-| `support_ticket_direct_api` | `dags/micro_orchestrators/direct_api_call.py` | OpenAI SDK, hand-written tool loop |
+| `example_hitl_approval` | `ApprovalOperator` | Approve or reject. Rejecting skips the downstream tasks |
+| `example_hitl_operator` | `HITLOperator` | N options, `multiple=True` |
+| `example_hitl_branch` | `HITLBranchOperator` | `options_mapping`  |
+| `example_hitl_entry` | `HITLEntryOperator` | Input form |
+| `example_agent_hitl_review` | common-ai `enable_hitl_review=True` | Note: HITL interaction in a separate plugin tab on the task instances |
 
-Shared pieces live in `include/custom_functions.py`,
-`include/fixtures/shipments.json`, and `include/models.py` (`TicketResponse`).
-All six use `gpt-5-mini` via `OPENAI_API_KEY` so the comparison is
-apples-to-apples; the baseline additionally goes through the
-`pydanticai_default` connection. The Temporal Dag needs the `temporal` service
-from `docker-compose.override.yml` (`astro dev restart` picks it up); its web
-UI is at `http://localhost:8233`.
+That last one is the only Dag here that uses common-ai's React review plugin.
+The plugin loads its JS bundle from `AIRFLOW__API__BASE_URL`, so if your Airflow
+isn't on `http://localhost:8080` you need the base-URL block in
+`docker-compose.override.yml`, which ships commented out. The four standard
+operators work either way.
 
-For deeper context on any of the above, see the
-[Astronomer guide](https://www.astronomer.io/docs/learn/airflow-common-ai-provider).
+### 05_connections_hooks
+
+| Dag | Provider component |
+|---|---|
+| `example_pydantic_ai_hook` | `PydanticAIHook.create_agent()` |
+| `example_mcp_connection_transports` | `mcp` connection using stdio and http |
+
+### other
+
+| Dag | What it builds |
+|---|---|
+| `email_routing` | `@task.llm` sorts mail into P0-P4, `@task.branch` routes it |
+| `support_reply_evals` | LLM as judge. Scores agent replies and customer reactions, CSAT|
+
+---
+
+Agent framework comparison
+--------------------------------------------------
+
+Six Dags run an identical support-ticket flow. Fetch a ticket, draft a
+structured `TicketResponse` using a `lookup_shipment` tool, HITL review branch.
+
+| Dag | Framework |
+|---|---|
+| `support_ticket_common_ai` | common-ai provider (`@task.agent`) |
+| `support_ticket_pydantic_ai` | pydantic-ai used directly |
+| `support_ticket_langgraph` | LangGraph ReAct agent |
+| `support_ticket_crewai` | CrewAI single-agent crew |
+| `support_ticket_temporal` | Temporal workflow |
+| `support_ticket_direct_api` | OpenAI SDK and a hand-written tool loop |
+
+All examples other than the common AI one use `gpt-5-mini` with `OPENAI_API_KEY`, adjust for other model providers.
+
+The Temporal Dag uses the `temporal` service from `docker-compose.override.yml`. Its web UI is at `http://localhost:8233`.
+
+---

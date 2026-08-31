@@ -11,3 +11,6 @@ airflow.cfg
 airflow.db
 CLAUDE.local.md
 dev
+.astro/config.local.lock 
+.astro/config.local.yaml
+.astro/config.lock
