@@ -114,7 +114,6 @@ class TicketResponseWorkflow:
 
 
 @dag(
-    dag_id="support_ticket_temporal",
     tags=["framework-comparison", "temporal", "hitl-operators", "support-ticket"],
     doc_md=__doc__,
 )

@@ -28,7 +28,6 @@ QUESTION = (
 
 
 @dag(
-    dag_id="example_mcp_connection_transports",
     tags=[
         "common-ai",
         "feature-example",

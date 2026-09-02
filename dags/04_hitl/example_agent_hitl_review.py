@@ -21,7 +21,6 @@ from include.seed import seed_primary
 
 
 @dag(
-    dag_id="example_agent_hitl_review",
     tags=["common-ai", "feature-example", "task.agent", "hitl-review", "sql-toolset"],
     doc_md=__doc__,
 )

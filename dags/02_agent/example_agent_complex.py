@@ -24,7 +24,6 @@ from include.seed import seed_primary
 
 
 @dag(
-    dag_id="example_agent_complex",
     tags=[
         "common-ai",
         "feature-example",

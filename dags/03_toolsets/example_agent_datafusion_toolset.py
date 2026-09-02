@@ -21,7 +21,6 @@ SRC = Path("/usr/local/airflow/include/csvs/shipping_routes.csv")
 
 
 @dag(
-    dag_id="example_agent_datafusion_toolset",
     tags=["common-ai", "feature-example", "task.agent", "datafusion-toolset"],
     doc_md=__doc__,
 )

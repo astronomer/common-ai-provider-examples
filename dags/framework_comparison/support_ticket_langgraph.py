@@ -27,7 +27,6 @@ from include.models import TicketResponse
 
 
 @dag(
-    dag_id="support_ticket_langgraph",
     tags=["framework-comparison", "langgraph", "hitl-operators", "support-ticket"],
     doc_md=__doc__,
 )

@@ -13,7 +13,6 @@ from airflow.sdk import dag, task
 
 
 @dag(
-    dag_id="example_agent_mcp_toolset",
     tags=["common-ai", "feature-example", "task.agent", "mcp-toolset"],
     doc_md=__doc__,
 )

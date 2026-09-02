@@ -32,7 +32,6 @@ class EmailClassification(BaseModel):
 
 
 @dag(
-    dag_id="email_routing",
     tags=[
         "common-ai",
         "use-case",

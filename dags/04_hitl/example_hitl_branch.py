@@ -21,7 +21,6 @@ from airflow.sdk import chain, dag, task
 
 
 @dag(
-    dag_id="example_hitl_branch",
     tags=[
         "standard-provider",
         "feature-example",

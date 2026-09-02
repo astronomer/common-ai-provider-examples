@@ -22,7 +22,6 @@ FIXTURE_PATH = "file:///usr/local/airflow/include/ship_reports/"
 
 
 @dag(
-    dag_id="example_llm_file_analysis",
     tags=[
         "common-ai",
         "feature-example",

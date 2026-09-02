@@ -14,7 +14,6 @@ from include.models import MissionPlan
 
 
 @dag(
-    dag_id="example_agent_basic",
     tags=["common-ai", "feature-example", "task.agent", "structured-output"],
     doc_md=__doc__,
 )

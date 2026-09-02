@@ -20,7 +20,6 @@ from airflow.sdk import Param, chain, dag, task
 
 
 @dag(
-    dag_id="example_hitl_entry",
     tags=[
         "standard-provider",
         "feature-example",

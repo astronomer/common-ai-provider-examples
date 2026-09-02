@@ -19,7 +19,6 @@ MANIFEST_DIR = Path("/usr/local/airflow/include/fixtures/cargo_manifests")
 
 
 @dag(
-    dag_id="example_llm_branch",
     tags=["common-ai", "feature-example", "task.llm_branch"],
     doc_md=__doc__,
 )

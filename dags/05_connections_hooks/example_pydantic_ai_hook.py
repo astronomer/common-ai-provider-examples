@@ -17,7 +17,6 @@ from include.models import SeverityReport
 
 
 @dag(
-    dag_id="example_pydantic_ai_hook",
     tags=["common-ai", "feature-example", "PydanticAIHook", "structured-output"],
     doc_md=__doc__,
 )

@@ -52,7 +52,6 @@ iss_toolset = IssOpenNotifyToolset()
 
 
 @dag(
-    dag_id="example_agent_advanced",
     tags=[
         "common-ai",
         "feature-example",

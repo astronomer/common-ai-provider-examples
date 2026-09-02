@@ -33,7 +33,6 @@ shipment_toolset = FunctionToolset(id="shipment_lookup", tools=[lookup_shipment]
 
 
 @dag(
-    dag_id="support_ticket_common_ai",
     tags=[
         "common-ai",
         "framework-comparison",

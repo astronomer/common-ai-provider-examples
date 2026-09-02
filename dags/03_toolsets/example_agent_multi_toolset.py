@@ -18,7 +18,6 @@ from include.seed import seed_primary
 
 
 @dag(
-    dag_id="example_agent_multi_toolset",
     tags=[
         "common-ai",
         "feature-example",

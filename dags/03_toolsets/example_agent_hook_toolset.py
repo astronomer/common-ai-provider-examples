@@ -15,7 +15,6 @@ from include.fixtures_hook import FixturesHook
 
 
 @dag(
-    dag_id="example_agent_hook_toolset",
     tags=["common-ai", "feature-example", "task.agent", "hook-toolset"],
     doc_md=__doc__,
 )

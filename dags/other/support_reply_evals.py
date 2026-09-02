@@ -55,7 +55,6 @@ class CustomerReplyScore(BaseModel):
 
 
 @dag(
-    dag_id="support_reply_evals",
     tags=[
         "common-ai",
         "use-case",

@@ -35,7 +35,6 @@ llm_policy = LLMRetryPolicy(
 
 
 @dag(
-    dag_id="example_llm_retry_policy",
     tags=[
         "common-ai",
         "feature-example",

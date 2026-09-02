@@ -27,7 +27,6 @@ from include.models import TicketResponse
 
 
 @dag(
-    dag_id="support_ticket_pydantic_ai",
     tags=["framework-comparison", "pydantic-ai", "hitl-operators", "support-ticket"],
     doc_md=__doc__,
 )

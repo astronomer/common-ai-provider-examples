@@ -14,7 +14,6 @@ from include.seed import seed_alt_with_drift, seed_primary
 
 
 @dag(
-    dag_id="example_llm_schema_compare",
     tags=["common-ai", "feature-example", "task.llm_schema_compare"],
     doc_md=__doc__,
 )

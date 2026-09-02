@@ -21,7 +21,6 @@ FIXTURE = Path("/usr/local/airflow/include/fixtures/anomaly_report.md")
 
 
 @dag(
-    dag_id="example_llm_operator",
     tags=[
         "common-ai",
         "feature-example",

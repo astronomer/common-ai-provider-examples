@@ -23,7 +23,6 @@ QUESTION = (
 
 
 @dag(
-    dag_id="example_llm_sql_query",
     tags=["common-ai", "feature-example", "task.llm_sql"],
     doc_md=__doc__,
 )

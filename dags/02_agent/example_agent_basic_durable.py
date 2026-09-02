@@ -78,7 +78,6 @@ durable_demo_toolset = FunctionToolset(
 
 
 @dag(
-    dag_id="example_agent_basic_durable",
     tags=[
         "common-ai",
         "feature-example",

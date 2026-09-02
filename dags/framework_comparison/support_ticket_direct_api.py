@@ -28,7 +28,6 @@ from include.models import TicketResponse
 
 
 @dag(
-    dag_id="support_ticket_direct_api",
     tags=["framework-comparison", "openai-sdk", "hitl-operators", "support-ticket"],
     doc_md=__doc__,
 )
